@@ -2,7 +2,6 @@ package com.sh4dov.myapplication666;
 
 import android.accounts.Account;
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -15,14 +14,16 @@ import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecovera
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
+import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
-import com.sh4dov.google.MyClass;
+import com.sh4dov.google.DriveService;
+import com.sh4dov.google.listeners.GetFilesListener;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.List;
 
-class Task extends AsyncTask<Activity, Integer, Integer>
-{
+class Task extends AsyncTask<Activity, Integer, Integer> {
     @Override
     protected Integer doInBackground(Activity... contexts) {
         GoogleAccountCredential credential = GoogleAccountCredential.usingOAuth2(contexts[0], Collections.singleton(DriveScopes.DRIVE));
@@ -33,15 +34,15 @@ class Task extends AsyncTask<Activity, Integer, Integer>
         try {
             // Try to perform a Drive API request, for instance:
             FileList list = service.files().list().execute();
-            int i=0;
+            int i = 0;
         } catch (UserRecoverableAuthIOException e) {
             contexts[0].startActivityForResult(e.getIntent(), 1);
         } catch (IOException e) {
             e.printStackTrace();
-        }catch(VerifyError e){
+        } catch (VerifyError e) {
             e.printStackTrace();
-        }catch(Exception e){
-            e.printStackTrace();new MyClass();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
         return 1;
@@ -57,8 +58,14 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        new Task().execute(this);
-
+       // new Task().execute(this);
+        DriveService driveService = new DriveService(this, 1, DriveScopes.DRIVE).setAccountName("sh4dov@gmail.com");
+        driveService.getFiles(new GetFilesListener() {
+            @Override
+            public void getFiles(List<File> files) {
+                int i=files.size();
+            }
+        });
     }
 
     @Override
@@ -66,7 +73,7 @@ public class MainActivity extends Activity {
         switch (requestCode) {
             case 1:
                 if (resultCode == RESULT_OK) {
-                    int i=0;
+                    int i = 0;
                     // App is authorized, you can go back to sending the API request
                 } else {
                     // User denied access, show him the account chooser again

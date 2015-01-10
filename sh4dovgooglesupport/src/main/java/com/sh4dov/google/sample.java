@@ -15,8 +15,6 @@
 package com.sh4dov.google;
 
 import com.google.api.client.auth.oauth2.Credential;
-import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
-import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.googleapis.media.MediaHttpDownloader;
 import com.google.api.client.googleapis.media.MediaHttpUploader;
 import com.google.api.client.http.GenericUrl;
@@ -26,7 +24,6 @@ import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.drive.Drive;
-import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.File;
 import com.google.common.base.Preconditions;
 
@@ -35,7 +32,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Collections;
 
 /**
  * A sample application that runs multiple requests against the Drive API. The requests this sample
@@ -53,19 +49,26 @@ import java.util.Collections;
 class DriveSample {
 
     private static final String UPLOAD_FILE_PATH = "Enter File Path";
-    private static final String DIR_FOR_DOWNLOADS = "Enter Download Directory";
     private static final java.io.File UPLOAD_FILE = new java.io.File(UPLOAD_FILE_PATH);
-
-    /** Global instance of the HTTP transport. */
+    private static final String DIR_FOR_DOWNLOADS = "Enter Download Directory";
+    /**
+     * Global instance of the HTTP transport.
+     */
     private static final HttpTransport HTTP_TRANSPORT = new NetHttpTransport();
 
-    /** Global instance of the JSON factory. */
+    /**
+     * Global instance of the JSON factory.
+     */
     private static final JsonFactory JSON_FACTORY = new JacksonFactory();
 
-    /** Global Drive API client. */
+    /**
+     * Global Drive API client.
+     */
     private static Drive drive;
 
-    /** Authorizes the installed application to access user's protected data. */
+    /**
+     * Authorizes the installed application to access user's protected data.
+     */
     private static Credential authorize() throws Exception {
         // load client secrets
 
@@ -109,7 +112,9 @@ class DriveSample {
         System.exit(1);
     }
 
-    /** Uploads a file using either resumable or direct media upload. */
+    /**
+     * Uploads a file using either resumable or direct media upload.
+     */
     private static File uploadFile(boolean useDirectUpload) throws IOException {
         File fileMetadata = new File();
         fileMetadata.setTitle(UPLOAD_FILE.getName());
@@ -125,7 +130,9 @@ class DriveSample {
         return insert.execute();
     }
 
-    /** Updates the name of the uploaded file to have a "drivetest-" prefix. */
+    /**
+     * Updates the name of the uploaded file to have a "drivetest-" prefix.
+     */
     private static File updateFileWithTestSuffix(String id) throws IOException {
         File fileMetadata = new File();
         fileMetadata.setTitle("drivetest-" + UPLOAD_FILE.getName());
@@ -134,7 +141,9 @@ class DriveSample {
         return update.execute();
     }
 
-    /** Downloads a file using either resumable or direct media download. */
+    /**
+     * Downloads a file using either resumable or direct media download.
+     */
     private static void downloadFile(boolean useDirectDownload, File uploadedFile)
             throws IOException {
         // create parent directory (if necessary)
