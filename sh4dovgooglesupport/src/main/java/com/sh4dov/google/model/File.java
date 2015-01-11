@@ -7,5 +7,28 @@ public class File {
         this.file = file;
     }
 
-    public String getTitle(){return file.getTitle();}
+    public String getTitle() {
+        return file.getTitle();
+    }
+
+    public File setTitle(String title) {
+        file.setTitle(title);
+        return this;
+    }
+
+    public String getId() {
+        return file.getId();
+    }
+
+    public long getFileSize() {
+        return file.getFileSize();
+    }
+
+    public String getDownloadUrl() {
+        return file.getDownloadUrl();
+    }
+
+    com.google.api.services.drive.model.File getSource() {
+        return file;
+    }
 }

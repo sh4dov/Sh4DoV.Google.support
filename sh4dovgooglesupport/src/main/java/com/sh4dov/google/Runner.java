@@ -39,7 +39,7 @@ class Runner<T extends Service> {
                 task = new ConnectTask<T>(operation, service);
                 task.execute();
             } else {
-                Log.e(PackageInfo.TAG, "Cannot run, task is not finished yet.");
+                Log.w(PackageInfo.TAG, "Cannot run this task right now because previous task is not finished yet. This task will be executed after current task.");
             }
         }
     }
@@ -47,7 +47,7 @@ class Runner<T extends Service> {
     @TargetApi(Build.VERSION_CODES.CUPCAKE)
     public boolean isConnected() {
         synchronized (sync) {
-            return task != null && task.getStatus() == AsyncTask.Status.RUNNING;
+            return task != null && task.getStatus() == AsyncTask.Status.RUNNING && !task.isFinished();
         }
     }
 

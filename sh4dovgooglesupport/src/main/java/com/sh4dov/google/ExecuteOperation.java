@@ -10,13 +10,13 @@ import com.sh4dov.google.misc.ExceptionDescriptor;
 import java.io.IOException;
 
 class ExecuteOperation<T> implements Operation<T> {
-    private Runner connector;
+    private Runner runner;
     private Activity activity;
     private Operation<T> operation;
     private int requestCode;
 
-    public ExecuteOperation(Runner connector, Activity activity, Operation<T> operation, int requestCode) {
-        this.connector = connector;
+    public ExecuteOperation(Runner runner, Activity activity, Operation<T> operation, int requestCode) {
+        this.runner = runner;
         this.activity = activity;
         this.operation = operation;
         this.requestCode = requestCode;
@@ -50,7 +50,7 @@ class ExecuteOperation<T> implements Operation<T> {
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                connector.run();
+                runner.run();
                 operation.onFinished();
             }
         });

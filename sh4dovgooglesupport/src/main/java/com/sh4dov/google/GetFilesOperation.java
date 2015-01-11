@@ -5,16 +5,18 @@ import android.app.Activity;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 import com.sh4dov.google.listeners.GetFilesListener;
+import com.sh4dov.google.listeners.OnFailedListener;
 import com.sh4dov.google.model.FileHelper;
 
 import java.io.IOException;
 import java.util.List;
 
-class GetFilesOperation implements Operation<DriveService> {
+class GetFilesOperation extends OperationBase<DriveService> {
     private Activity activity;
     private GetFilesListener getFilesListener;
 
-    public GetFilesOperation(Activity activity, GetFilesListener getFilesListener) {
+    public GetFilesOperation(Activity activity, GetFilesListener getFilesListener, OnFailedListener onFailedListener) {
+        super(onFailedListener);
         this.activity = activity;
         this.getFilesListener = getFilesListener;
     }
@@ -26,18 +28,9 @@ class GetFilesOperation implements Operation<DriveService> {
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                getFilesListener.getFiles(FileHelper.convert(files));
+                getFilesListener.onGetFiles(FileHelper.convert(files));
             }
         });
     }
 
-    @Override
-    public void onFinished() {
-
-    }
-
-    @Override
-    public void onFailed(Exception e) {
-
-    }
 }

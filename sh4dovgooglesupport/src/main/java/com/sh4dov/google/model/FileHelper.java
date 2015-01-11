@@ -16,4 +16,12 @@ public final class FileHelper {
 
         return result;
     }
+
+    public static com.google.api.services.drive.model.File convert(File file){
+        return file.getSource();
+    }
+
+    public static File createFile(){
+        return new File(new com.google.api.services.drive.model.File());
+    }
 }

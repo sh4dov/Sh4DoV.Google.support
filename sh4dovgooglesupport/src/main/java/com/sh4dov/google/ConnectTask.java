@@ -9,6 +9,7 @@ import android.util.Log;
 class ConnectTask<T extends Service> extends AsyncTask<Void, Void, Void> {
     private ExecuteOperation<T> operation;
     private T service;
+    private boolean isFinished = false;
 
     public ConnectTask(ExecuteOperation<T> operation, T service) {
         this.operation = operation;
@@ -17,10 +18,19 @@ class ConnectTask<T extends Service> extends AsyncTask<Void, Void, Void> {
 
     Operation<T> getOperation(){return operation.getOperation();}
 
+    public boolean isFinished(){return isFinished; }
+
     @Override
     protected Void doInBackground(Void... voids) {
         operation.execute(service);
         Log.d(PackageInfo.TAG, "Executed operation " + operation.getOperation().getClass().getName());
         return null;
+    }
+
+    @Override
+    protected void onPostExecute(Void result) {
+        super.onPostExecute(result);
+        isFinished = true;
+        operation.onFinished();
     }
 }

@@ -5,5 +5,5 @@ import com.sh4dov.google.model.File;
 import java.util.List;
 
 public interface GetFilesListener extends UserRecoverableRequestCodeProvider {
-    void getFiles(List<File> files);
+    void onGetFiles(List<File> files);
 }
