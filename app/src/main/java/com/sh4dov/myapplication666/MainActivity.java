@@ -1,71 +1,68 @@
 package com.sh4dov.myapplication666;
 
-import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.Activity;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 
-import com.google.api.client.extensions.android.http.AndroidHttp;
-import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
-import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
-import com.google.api.client.json.gson.GsonFactory;
-import com.google.api.services.drive.Drive;
+import com.google.android.gms.common.AccountPicker;
 import com.google.api.services.drive.DriveScopes;
-import com.google.api.services.drive.model.File;
-import com.google.api.services.drive.model.FileList;
 import com.sh4dov.google.DriveService;
 import com.sh4dov.google.listeners.GetFilesListener;
+import com.sh4dov.google.model.File;
 
-import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
-
-class Task extends AsyncTask<Activity, Integer, Integer> {
-    @Override
-    protected Integer doInBackground(Activity... contexts) {
-        GoogleAccountCredential credential = GoogleAccountCredential.usingOAuth2(contexts[0], Collections.singleton(DriveScopes.DRIVE));
-        Account[] allAccounts = credential.getAllAccounts();
-        credential.setSelectedAccountName(allAccounts[0].name);
-        Drive service = new Drive.Builder(AndroidHttp.newCompatibleTransport(), new GsonFactory(), credential).build();
-
-        try {
-            // Try to perform a Drive API request, for instance:
-            FileList list = service.files().list().execute();
-            int i = 0;
-        } catch (UserRecoverableAuthIOException e) {
-            contexts[0].startActivityForResult(e.getIntent(), 1);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (VerifyError e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return 1;
-    }
-}
 
 public class MainActivity extends Activity {
 
-    private Drive service;
+    private DriveService driveService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-       // new Task().execute(this);
-        DriveService driveService = new DriveService(this, 1, DriveScopes.DRIVE).setAccountName("sh4dov@gmail.com");
+        choseAccount();
+
+        // new Task().execute(this);
+
+    }
+
+    private void testGDrive(String accountName) {
+        driveService = new DriveService(this, DriveScopes.DRIVE)
+                .setAccountName(accountName)
+                .setApplicationName("Sample app by Sh4DoV");
         driveService.getFiles(new GetFilesListener() {
             @Override
             public void getFiles(List<File> files) {
-                int i=files.size();
+                TextView tv = (TextView) findViewById(R.id.txt);
+                StringBuilder sb = new StringBuilder();
+                for (File file : files) {
+                    sb.append(file.getTitle() + "\r\n");
+                }
+                tv.setText(sb.toString());
+            }
+
+            @Override
+            public int getRequestCode() {
+                return 1;
             }
         });
+    }
+
+    protected void onStop() {
+        super.onStop();
+        if(driveService != null && driveService.isConnected() && !driveService.isFinished()){
+            driveService.close();
+        }
+    }
+
+    private void choseAccount() {
+        Intent intent = AccountPicker.newChooseAccountIntent(null, null, new String[]{"com.google"}, true, null, null, null, null);
+        startActivityForResult(intent, 2);
     }
 
     @Override
@@ -79,6 +76,12 @@ public class MainActivity extends Activity {
                     // User denied access, show him the account chooser again
                 }
                 break;
+
+            case 2:
+                if (resultCode == RESULT_OK) {
+                    String accountName = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
+                    testGDrive(accountName);
+                }
         }
     }
 

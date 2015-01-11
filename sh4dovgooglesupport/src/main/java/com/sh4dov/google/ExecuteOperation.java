@@ -1,21 +1,48 @@
 package com.sh4dov.google;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.util.Log;
+
+import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
+import com.sh4dov.google.misc.ExceptionDescriptor;
+
+import java.io.IOException;
 
 class ExecuteOperation<T> implements Operation<T> {
     private Runner connector;
     private Activity activity;
     private Operation<T> operation;
+    private int requestCode;
 
-    public ExecuteOperation(Runner connector, Activity activity, Operation<T> operation) {
+    public ExecuteOperation(Runner connector, Activity activity, Operation<T> operation, int requestCode) {
         this.connector = connector;
         this.activity = activity;
         this.operation = operation;
+        this.requestCode = requestCode;
+    }
+
+    Operation<T> getOperation() {
+        return operation;
     }
 
     @Override
-    public void execute(T scope) {
-        operation.execute(scope);
+    public void execute(final T scope) {
+        try {
+            operation.execute(scope);
+        } catch (UserRecoverableAuthIOException e) {
+            Log.d(PackageInfo.TAG, operation.getClass().getName() + ": " + new ExceptionDescriptor().getDescription(e));
+            final Intent intent = e.getIntent();
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    activity.startActivityForResult(intent, requestCode);
+                }
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+            onFailed(e);
+        }
     }
 
     @Override
@@ -30,11 +57,11 @@ class ExecuteOperation<T> implements Operation<T> {
     }
 
     @Override
-    public void onFailed() {
+    public void onFailed(final Exception e) {
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                operation.onFailed();
+                operation.onFailed(e);
             }
         });
     }

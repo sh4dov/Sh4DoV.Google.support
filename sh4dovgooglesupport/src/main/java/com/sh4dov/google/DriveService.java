@@ -13,13 +13,12 @@ import java.util.Collections;
 public class DriveService implements Service {
     private String accountName;
     private Activity activity;
-    private int reconnectRequestCode;
     private String scope;
     private Runner<DriveService> runner;
+    private String applicationName;
 
-    public DriveService(Activity activity, int reconnectRequestCode, String scope) {
+    public DriveService(Activity activity, String scope) {
         this.activity = activity;
-        this.reconnectRequestCode = reconnectRequestCode;
         this.scope = scope;
         runner = new Runner<DriveService>(activity, this);
     }
@@ -29,14 +28,36 @@ public class DriveService implements Service {
         return this;
     }
 
+    public DriveService setApplicationName(String name){
+        applicationName = name;
+        return this;
+    }
+
+    public void close(){
+        runner.close();
+    }
+
+    public boolean isFinished(){
+        return runner.isFinished();
+    }
+
+    public boolean isConnected(){
+        return runner.isConnected();
+    }
+
     public void getFiles(GetFilesListener listener) {
-        GetFilesOperation operation = new GetFilesOperation(listener);
-        runner.addOperation(operation);
+        GetFilesOperation operation = new GetFilesOperation(activity, listener);
+        runner.addOperation(operation, listener.getRequestCode());
         runner.run();
     }
 
     protected Drive getDrive() {
-        return new Drive.Builder(AndroidHttp.newCompatibleTransport(), new AndroidJsonFactory(), getCredential()).build();
+        Drive.Builder builder = new Drive.Builder(AndroidHttp.newCompatibleTransport(), new AndroidJsonFactory(), getCredential());
+        if(applicationName != null){
+            builder.setApplicationName(applicationName);
+        }
+
+        return builder.build();
     }
 
     private GoogleAccountCredential getCredential() {
