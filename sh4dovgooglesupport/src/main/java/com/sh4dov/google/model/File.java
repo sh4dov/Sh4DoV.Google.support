@@ -1,5 +1,7 @@
 package com.sh4dov.google.model;
 
+import com.google.api.client.util.DateTime;
+
 public class File {
     private com.google.api.services.drive.model.File file;
 
@@ -18,6 +20,10 @@ public class File {
 
     public String getId() {
         return file.getId();
+    }
+
+    public DateTime getModifiedDate() {
+        return file.getModifiedDate();
     }
 
     public long getFileSize() {

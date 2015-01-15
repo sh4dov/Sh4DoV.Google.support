@@ -6,24 +6,28 @@ import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.extensions.android.json.AndroidJsonFactory;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.services.drive.Drive;
+import com.google.api.services.drive.DriveScopes;
 import com.sh4dov.google.listeners.DownloadFileListener;
 import com.sh4dov.google.listeners.GetFilesListener;
 import com.sh4dov.google.listeners.OnFailedListener;
 import com.sh4dov.google.listeners.UploadFileListener;
 import com.sh4dov.google.model.File;
 
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.Collection;
 
 public class DriveService implements Service {
     private String accountName;
     private Activity activity;
-    private String scope;
     private Runner<DriveService> runner;
     private String applicationName;
+    private Collection<String> scopes = new ArrayList<String>();
+    public final static String DRIVE = DriveScopes.DRIVE;
+    public final static String DRIVE_APPDATA = DriveScopes.DRIVE_APPDATA;
+    public final static String USER_INFO_PROFILE = "https://www.googleapis.com/auth/userinfo.profile";
 
-    public DriveService(Activity activity, String scope) {
+    public DriveService(Activity activity) {
         this.activity = activity;
-        this.scope = scope;
         runner = new Runner<DriveService>(activity, this);
     }
 
@@ -34,6 +38,14 @@ public class DriveService implements Service {
 
     public DriveService setApplicationName(String name) {
         applicationName = name;
+        return this;
+    }
+
+    public DriveService addScope(String scope){
+        if(!scopes.contains(scope)){
+            scopes.add(scope);
+        }
+
         return this;
     }
 
@@ -77,7 +89,7 @@ public class DriveService implements Service {
     }
 
     private GoogleAccountCredential getCredential() {
-        GoogleAccountCredential credential = GoogleAccountCredential.usingOAuth2(activity, Collections.singleton(scope));
+        GoogleAccountCredential credential = GoogleAccountCredential.usingOAuth2(activity, scopes);
         if (accountName != null) {
             credential.setSelectedAccountName(accountName);
         }

@@ -36,7 +36,8 @@ public class MainActivity extends Activity {
     }
 
     private void testGDrive(String accountName) {
-        driveService = new DriveService(this, DriveScopes.DRIVE)
+        driveService = new DriveService(this)
+                .addScope(DriveScopes.DRIVE)
                 .setAccountName(accountName)
                 .setApplicationName("Sample app by Sh4DoV");
 
@@ -66,7 +67,7 @@ public class MainActivity extends Activity {
                 StringBuilder sb = new StringBuilder();
                 File uploadFile = null;
                 for (File file : files) {
-                    sb.append(file.getTitle() + "\r\n");
+                    sb.append(file.getTitle() + " size: " + file.getFileSize() + " " + file.getModifiedDate() + "\r\n");
 
                     if(file.getTitle().equalsIgnoreCase("gp.apk")){
                         driveService.downloadFile(file, downloadFileListener, null);
