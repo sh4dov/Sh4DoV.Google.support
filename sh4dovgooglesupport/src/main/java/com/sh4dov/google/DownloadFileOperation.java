@@ -5,9 +5,9 @@ import android.app.Activity;
 import com.google.api.client.googleapis.media.MediaHttpDownloader;
 import com.google.api.client.googleapis.media.MediaHttpDownloaderProgressListener;
 import com.google.api.client.http.GenericUrl;
+import com.google.api.services.drive.model.File;
 import com.sh4dov.google.listeners.DownloadFileListener;
 import com.sh4dov.google.listeners.OnFailedListener;
-import com.sh4dov.google.model.File;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

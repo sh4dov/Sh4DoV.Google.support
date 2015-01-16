@@ -6,7 +6,6 @@ import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 import com.sh4dov.google.listeners.GetFilesListener;
 import com.sh4dov.google.listeners.OnFailedListener;
-import com.sh4dov.google.model.FileHelper;
 
 import java.io.IOException;
 import java.util.List;
@@ -28,7 +27,7 @@ class GetFilesOperation extends OperationBase<DriveService> {
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                getFilesListener.onGetFiles(FileHelper.convert(files));
+                getFilesListener.onGetFiles(files);
             }
         });
     }

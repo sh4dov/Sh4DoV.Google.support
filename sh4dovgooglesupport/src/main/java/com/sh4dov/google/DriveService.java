@@ -7,24 +7,24 @@ import com.google.api.client.extensions.android.json.AndroidJsonFactory;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
+import com.google.api.services.drive.model.File;
 import com.sh4dov.google.listeners.DownloadFileListener;
 import com.sh4dov.google.listeners.GetFilesListener;
 import com.sh4dov.google.listeners.OnFailedListener;
 import com.sh4dov.google.listeners.UploadFileListener;
-import com.sh4dov.google.model.File;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
 public class DriveService implements Service {
+    public final static String DRIVE = DriveScopes.DRIVE;
+    public final static String DRIVE_APPDATA = DriveScopes.DRIVE_APPDATA;
+    public final static String USER_INFO_PROFILE = "https://www.googleapis.com/auth/userinfo.profile";
     private String accountName;
     private Activity activity;
     private Runner<DriveService> runner;
     private String applicationName;
     private Collection<String> scopes = new ArrayList<String>();
-    public final static String DRIVE = DriveScopes.DRIVE;
-    public final static String DRIVE_APPDATA = DriveScopes.DRIVE_APPDATA;
-    public final static String USER_INFO_PROFILE = "https://www.googleapis.com/auth/userinfo.profile";
 
     public DriveService(Activity activity) {
         this.activity = activity;
@@ -41,8 +41,8 @@ public class DriveService implements Service {
         return this;
     }
 
-    public DriveService addScope(String scope){
-        if(!scopes.contains(scope)){
+    public DriveService addScope(String scope) {
+        if (!scopes.contains(scope)) {
             scopes.add(scope);
         }
 
@@ -73,7 +73,7 @@ public class DriveService implements Service {
         runner.run();
     }
 
-    public void uploadFile(File file, byte[] content, UploadFileListener listener, OnFailedListener onFailedListener){
+    public void uploadFile(File file, byte[] content, UploadFileListener listener, OnFailedListener onFailedListener) {
         UploadFileOperation operation = new UploadFileOperation(activity, file, content, listener, onFailedListener);
         runner.addOperation(operation, listener.getRequestCode());
         runner.run();

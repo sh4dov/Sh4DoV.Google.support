@@ -6,10 +6,9 @@ import com.google.api.client.googleapis.media.MediaHttpUploader;
 import com.google.api.client.googleapis.media.MediaHttpUploaderProgressListener;
 import com.google.api.client.http.InputStreamContent;
 import com.google.api.services.drive.Drive;
+import com.google.api.services.drive.model.File;
 import com.sh4dov.google.listeners.OnFailedListener;
 import com.sh4dov.google.listeners.UploadFileListener;
-import com.sh4dov.google.model.File;
-import com.sh4dov.google.model.FileHelper;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
@@ -22,7 +21,7 @@ public class UploadFileOperation extends OperationBase<DriveService> implements 
     private byte[] content;
     private UploadFileListener listener;
 
-    public UploadFileOperation(Activity activity,  File file, byte[] content, UploadFileListener listener, OnFailedListener onFailedListener) {
+    public UploadFileOperation(Activity activity, File file, byte[] content, UploadFileListener listener, OnFailedListener onFailedListener) {
         super(onFailedListener);
         this.activity = activity;
         this.file = file;
@@ -37,13 +36,13 @@ public class UploadFileOperation extends OperationBase<DriveService> implements 
         String id = file.getId();
 
         if (id == null || id.isEmpty()) {
-            Drive.Files.Insert insert = scope.getDrive().files().insert(FileHelper.convert(file), inputStreamContent);
+            Drive.Files.Insert insert = scope.getDrive().files().insert(file, inputStreamContent);
             insert.getMediaHttpUploader()
                     .setDirectUploadEnabled(DIRECT_UPLOAD_ENABLED)
                     .setProgressListener(this);
             insert.execute();
         } else {
-            Drive.Files.Update update = scope.getDrive().files().update(id, FileHelper.convert(file), inputStreamContent);
+            Drive.Files.Update update = scope.getDrive().files().update(id, file, inputStreamContent);
             update.getMediaHttpUploader()
                     .setDirectUploadEnabled(DIRECT_UPLOAD_ENABLED)
                     .setProgressListener(this);
@@ -64,7 +63,7 @@ public class UploadFileOperation extends OperationBase<DriveService> implements 
                 }
                 listener.onProgress(file, progress);
 
-                if(uploader.getUploadState() == MediaHttpUploader.UploadState.MEDIA_COMPLETE){
+                if (uploader.getUploadState() == MediaHttpUploader.UploadState.MEDIA_COMPLETE) {
                     listener.onUploaded(file);
                 }
             }

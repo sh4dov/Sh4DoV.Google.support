@@ -1,4 +1,4 @@
-package com.sh4dov.myapplication666;
+package com.sh4dov.myapplication;
 
 import android.accounts.AccountManager;
 import android.app.Activity;
@@ -10,12 +10,12 @@ import android.widget.TextView;
 
 import com.google.android.gms.common.AccountPicker;
 import com.google.api.services.drive.DriveScopes;
+import com.google.api.services.drive.model.File;
 import com.sh4dov.google.DriveService;
+import com.sh4dov.google.FileHelper;
 import com.sh4dov.google.listeners.DownloadFileListener;
 import com.sh4dov.google.listeners.GetFilesListener;
 import com.sh4dov.google.listeners.UploadFileListener;
-import com.sh4dov.google.model.File;
-import com.sh4dov.google.model.FileHelper;
 
 import java.util.Date;
 import java.util.List;
@@ -67,7 +67,10 @@ public class MainActivity extends Activity {
                 StringBuilder sb = new StringBuilder();
                 File uploadFile = null;
                 for (File file : files) {
-                    sb.append(file.getTitle() + " size: " + file.getFileSize() + " " + file.getModifiedDate() + "\r\n");
+                    if(FileHelper.isFolder(file)){
+                        sb.append("FOLDER: ");
+                    }
+                    sb.append(file.getTitle() + "\r\n");
 
                     if(file.getTitle().equalsIgnoreCase("gp.apk")){
                         driveService.downloadFile(file, downloadFileListener, null);
@@ -80,7 +83,7 @@ public class MainActivity extends Activity {
                 tv.setText(sb.toString());
 
                 if(uploadFile == null){
-                    uploadFile = FileHelper.createFile();
+                    uploadFile = new File();
                     uploadFile.setTitle("test.txt");
                 }
 

@@ -16,9 +16,13 @@ class ConnectTask<T extends Service> extends AsyncTask<Void, Void, Void> {
         this.service = service;
     }
 
-    Operation<T> getOperation(){return operation.getOperation();}
+    Operation<T> getOperation() {
+        return operation.getOperation();
+    }
 
-    public boolean isFinished(){return isFinished; }
+    public boolean isFinished() {
+        return isFinished;
+    }
 
     @Override
     protected Void doInBackground(Void... voids) {
