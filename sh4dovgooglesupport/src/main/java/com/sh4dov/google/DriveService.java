@@ -79,6 +79,12 @@ public class DriveService implements Service {
         runner.run();
     }
 
+    public void uploadFolder(File file, UploadFileListener listener, OnFailedListener onFailedListener){
+        UploadedFolderOperation operation = new UploadedFolderOperation(activity, file, listener, onFailedListener);
+        runner.addOperation(operation, listener.getRequestCode());
+        runner.run();
+    }
+
     protected Drive getDrive() {
         Drive.Builder builder = new Drive.Builder(AndroidHttp.newCompatibleTransport(), new AndroidJsonFactory(), getCredential());
         if (applicationName != null) {
