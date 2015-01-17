@@ -45,8 +45,13 @@ public class UploadFileOperation extends OperationBase<DriveService> implements 
         request.getMediaHttpUploader()
                 .setDirectUploadEnabled(DIRECT_UPLOAD_ENABLED)
                 .setProgressListener(this);
-        File newFile = request.execute();
-        listener.onUploaded(newFile);
+        final File newFile = request.execute();
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                listener.onUploaded(newFile);
+            }
+        });
     }
 
     @Override
