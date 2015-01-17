@@ -5,6 +5,6 @@ import com.google.api.services.drive.model.File;
 
 import java.util.List;
 
-public interface GetFilesListener extends UserRecoverableRequestCodeProvider {
+public interface GetFilesListener {
     void onGetFiles(List<File> files);
 }

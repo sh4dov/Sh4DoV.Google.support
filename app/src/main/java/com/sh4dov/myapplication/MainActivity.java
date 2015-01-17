@@ -13,9 +13,12 @@ import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.File;
 import com.sh4dov.google.DriveService;
 import com.sh4dov.google.FileHelper;
+import com.sh4dov.google.builders.FileBuilder;
 import com.sh4dov.google.listeners.DownloadFileListener;
+import com.sh4dov.google.listeners.FolderListener;
 import com.sh4dov.google.listeners.GetFilesListener;
 import com.sh4dov.google.listeners.UploadFileListener;
+import com.sh4dov.google.listeners.UserRecoverableRequestCodeProvider;
 
 import java.util.Date;
 import java.util.List;
@@ -39,7 +42,20 @@ public class MainActivity extends Activity {
         driveService = new DriveService(this)
                 .addScope(DriveScopes.DRIVE)
                 .setAccountName(accountName)
-                .setApplicationName("Sample app by Sh4DoV");
+                .setApplicationName("Sample app by Sh4DoV")
+                .setUserRecoverableRequestCodeProvider(new UserRecoverableRequestCodeProvider() {
+                    @Override
+                    public int getRequestCode() {
+                        return 1;
+                    }
+                });
+
+        driveService.uploadFolder(FileBuilder.createNewFolder().setTitle("asd").build(), new FolderListener() {
+            @Override
+            public void onUpdatedFolder(File newFolder) {
+                String id = newFolder.getId();
+            }
+        }, null, null);
 
         final DownloadFileListener downloadFileListener = new DownloadFileListener() {
             @Override
@@ -53,11 +69,6 @@ public class MainActivity extends Activity {
                 TextView tv = (TextView) findViewById(R.id.dwnload);
                 tv.setText("downloading file " + file.getTitle() + ": " + progress);
             }
-
-            @Override
-            public int getRequestCode() {
-                return 1;
-            }
         };
 
         driveService.getFiles(new GetFilesListener() {
@@ -67,22 +78,22 @@ public class MainActivity extends Activity {
                 StringBuilder sb = new StringBuilder();
                 File uploadFile = null;
                 for (File file : files) {
-                    if(FileHelper.isFolder(file)){
+                    if (FileHelper.isFolder(file)) {
                         sb.append("FOLDER: ");
                     }
                     sb.append(file.getTitle() + "\r\n");
 
-                    if(file.getTitle().equalsIgnoreCase("gp.apk")){
-                        driveService.downloadFile(file, downloadFileListener, null);
+                    if (file.getTitle().equalsIgnoreCase("gp.apk")) {
+                        driveService.downloadFile(file, downloadFileListener, null, null);
                     }
 
-                    if(file.getTitle().equalsIgnoreCase("test.txt")){
+                    if (file.getTitle().equalsIgnoreCase("test.txt")) {
                         uploadFile = file;
                     }
                 }
                 tv.setText(sb.toString());
 
-                if(uploadFile == null){
+                if (uploadFile == null) {
                     uploadFile = new File();
                     uploadFile.setTitle("test.txt");
                 }
@@ -98,24 +109,14 @@ public class MainActivity extends Activity {
                     public void onProgress(File file, double progress) {
 
                     }
-
-                    @Override
-                    public int getRequestCode() {
-                        return 0;
-                    }
-                }, null);
+                }, null, null);
             }
-
-            @Override
-            public int getRequestCode() {
-                return 1;
-            }
-        }, null);
+        }, null, null);
     }
 
     protected void onStop() {
         super.onStop();
-        if(driveService != null && driveService.isConnected() && !driveService.isFinished()){
+        if (driveService != null && driveService.isConnected() && !driveService.isFinished()) {
             driveService.close();
         }
     }

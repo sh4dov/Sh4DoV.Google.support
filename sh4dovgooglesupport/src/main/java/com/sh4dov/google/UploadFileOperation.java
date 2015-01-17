@@ -5,7 +5,7 @@ import android.app.Activity;
 import com.google.api.client.googleapis.media.MediaHttpUploader;
 import com.google.api.client.googleapis.media.MediaHttpUploaderProgressListener;
 import com.google.api.client.http.InputStreamContent;
-import com.google.api.services.drive.Drive;
+import com.google.api.services.drive.DriveRequest;
 import com.google.api.services.drive.model.File;
 import com.sh4dov.google.listeners.OnFailedListener;
 import com.sh4dov.google.listeners.UploadFileListener;
@@ -34,20 +34,19 @@ public class UploadFileOperation extends OperationBase<DriveService> implements 
         InputStreamContent inputStreamContent = new InputStreamContent("application/octet-stream", new BufferedInputStream(new ByteArrayInputStream(content)));
         inputStreamContent.setLength(content.length);
         String id = file.getId();
+        DriveRequest<File> request;
 
         if (id == null || id.isEmpty()) {
-            Drive.Files.Insert insert = scope.getDrive().files().insert(file, inputStreamContent);
-            insert.getMediaHttpUploader()
-                    .setDirectUploadEnabled(DIRECT_UPLOAD_ENABLED)
-                    .setProgressListener(this);
-            insert.execute();
+            request = scope.getDrive().files().insert(file, inputStreamContent);
         } else {
-            Drive.Files.Update update = scope.getDrive().files().update(id, file, inputStreamContent);
-            update.getMediaHttpUploader()
-                    .setDirectUploadEnabled(DIRECT_UPLOAD_ENABLED)
-                    .setProgressListener(this);
-            update.execute();
+            request = scope.getDrive().files().update(id, file, inputStreamContent);
         }
+
+        request.getMediaHttpUploader()
+                .setDirectUploadEnabled(DIRECT_UPLOAD_ENABLED)
+                .setProgressListener(this);
+        File newFile = request.execute();
+        listener.onUploaded(newFile);
     }
 
     @Override
@@ -60,12 +59,9 @@ public class UploadFileOperation extends OperationBase<DriveService> implements 
                     progress = uploader.getProgress();
                 } catch (IOException e) {
                     e.printStackTrace();
+                    onFailed(e);
                 }
                 listener.onProgress(file, progress);
-
-                if (uploader.getUploadState() == MediaHttpUploader.UploadState.MEDIA_COMPLETE) {
-                    listener.onUploaded(file);
-                }
             }
         });
     }
