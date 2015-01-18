@@ -1,7 +1,7 @@
 package com.sh4dov.google.builders;
 
 import com.google.api.services.drive.model.File;
-import com.sh4dov.google.FileHelper;
+import com.sh4dov.google.utils.FileHelper;
 
 public class FileBuilder {
     private File file;

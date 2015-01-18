@@ -1,4 +1,4 @@
-package com.sh4dov.google.misc;
+package com.sh4dov.google.utils;
 
 import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
 

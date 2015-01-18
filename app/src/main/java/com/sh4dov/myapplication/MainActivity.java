@@ -12,13 +12,13 @@ import com.google.android.gms.common.AccountPicker;
 import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.File;
 import com.sh4dov.google.DriveService;
-import com.sh4dov.google.FileHelper;
 import com.sh4dov.google.builders.FileBuilder;
 import com.sh4dov.google.listeners.DownloadFileListener;
 import com.sh4dov.google.listeners.FolderListener;
 import com.sh4dov.google.listeners.GetFilesListener;
 import com.sh4dov.google.listeners.UploadFileListener;
 import com.sh4dov.google.listeners.UserRecoverableRequestCodeProvider;
+import com.sh4dov.google.utils.FileHelper;
 
 import java.util.Date;
 import java.util.List;

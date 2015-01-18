@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.util.Log;
 
 import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
-import com.sh4dov.google.misc.ExceptionDescriptor;
+import com.sh4dov.google.utils.ExceptionDescriptor;
 
 import java.io.IOException;
 
