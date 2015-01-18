@@ -9,10 +9,10 @@ public abstract class OperationBase<T extends Service> implements Operation<T> {
         this.onFailedListener = onFailedListener != null ? onFailedListener : OnFailedListenerNullObject.getInstance();
     }
 
-    public void onFinished() {
-    }
-
     public void onFailed(Exception e) {
         onFailedListener.onFailed(e);
+    }
+
+    public void onFinished() {
     }
 }

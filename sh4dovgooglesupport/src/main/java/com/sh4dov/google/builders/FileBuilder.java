@@ -19,9 +19,8 @@ public class FileBuilder {
                 .setMimeType(FileHelper.FOLDER_MIME_TYPE);
     }
 
-    public FileBuilder setTitle(String title) {
-        file.setTitle(title);
-        return this;
+    public File build() {
+        return file;
     }
 
     public FileBuilder setMimeType(String mimeType) {
@@ -29,7 +28,8 @@ public class FileBuilder {
         return this;
     }
 
-    public File build() {
-        return file;
+    public FileBuilder setTitle(String title) {
+        file.setTitle(title);
+        return this;
     }
 }

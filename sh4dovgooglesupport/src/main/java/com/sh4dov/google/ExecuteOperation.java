@@ -10,20 +10,16 @@ import com.sh4dov.google.misc.ExceptionDescriptor;
 import java.io.IOException;
 
 class ExecuteOperation<T> implements Operation<T> {
-    private Runner runner;
     private Activity activity;
     private Operation<T> operation;
     private int requestCode;
+    private Runner runner;
 
     public ExecuteOperation(Runner runner, Activity activity, Operation<T> operation, int requestCode) {
         this.runner = runner;
         this.activity = activity;
         this.operation = operation;
         this.requestCode = requestCode;
-    }
-
-    Operation<T> getOperation() {
-        return operation;
     }
 
     @Override
@@ -46,6 +42,16 @@ class ExecuteOperation<T> implements Operation<T> {
     }
 
     @Override
+    public void onFailed(final Exception e) {
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                operation.onFailed(e);
+            }
+        });
+    }
+
+    @Override
     public void onFinished() {
         activity.runOnUiThread(new Runnable() {
             @Override
@@ -56,13 +62,7 @@ class ExecuteOperation<T> implements Operation<T> {
         });
     }
 
-    @Override
-    public void onFailed(final Exception e) {
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                operation.onFailed(e);
-            }
-        });
+    Operation<T> getOperation() {
+        return operation;
     }
 }

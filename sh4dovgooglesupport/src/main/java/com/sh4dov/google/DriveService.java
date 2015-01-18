@@ -23,16 +23,52 @@ public class DriveService implements Service {
     public final static String DRIVE = DriveScopes.DRIVE;
     public final static String DRIVE_APPDATA = DriveScopes.DRIVE_APPDATA;
     public final static String USER_INFO_PROFILE = "https://www.googleapis.com/auth/userinfo.profile";
-    private UserRecoverableRequestCodeProvider userRecoverableRequestCodeProvider;
     private String accountName;
     private Activity activity;
-    private Runner<DriveService> runner;
     private String applicationName;
+    private Runner<DriveService> runner;
     private Collection<String> scopes = new ArrayList<String>();
+    private UserRecoverableRequestCodeProvider userRecoverableRequestCodeProvider;
 
     public DriveService(Activity activity) {
         this.activity = activity;
         runner = new Runner<DriveService>(activity, this);
+    }
+
+    public DriveService addScope(String scope) {
+        if (!scopes.contains(scope)) {
+            scopes.add(scope);
+        }
+
+        return this;
+    }
+
+    public void close() {
+        runner.close();
+    }
+
+    public void downloadFile(File file, DownloadFileListener listener, OnFailedListener onFailedListener, UserRecoverableRequestCodeProvider userRecoverableRequestCodeProvider) {
+        DownloadFileOperation operation = new DownloadFileOperation(activity, file, listener, onFailedListener);
+        runner.addOperation(operation, getRequestCode(userRecoverableRequestCodeProvider));
+        runner.run();
+    }
+
+    public void getFiles(GetFilesListener getFilesListener, OnFailedListener onFailedListener, UserRecoverableRequestCodeProvider userRecoverableRequestCodeProvider) {
+        getFiles(null, getFilesListener, onFailedListener, userRecoverableRequestCodeProvider);
+    }
+
+    public void getFiles(String q, GetFilesListener getFilesListener, OnFailedListener onFailedListener, UserRecoverableRequestCodeProvider userRecoverableRequestCodeProvider) {
+        GetFilesOperation operation = new GetFilesOperation(q, activity, getFilesListener, onFailedListener);
+        runner.addOperation(operation, getRequestCode(userRecoverableRequestCodeProvider));
+        runner.run();
+    }
+
+    public boolean isConnected() {
+        return runner.isConnected();
+    }
+
+    public boolean isFinished() {
+        return runner.isFinished();
     }
 
     public DriveService setAccountName(String accountName) {
@@ -45,53 +81,9 @@ public class DriveService implements Service {
         return this;
     }
 
-    public DriveService addScope(String scope) {
-        if (!scopes.contains(scope)) {
-            scopes.add(scope);
-        }
-
-        return this;
-    }
-
     public DriveService setUserRecoverableRequestCodeProvider(UserRecoverableRequestCodeProvider userRecoverableRequestCodeProvider) {
         this.userRecoverableRequestCodeProvider = userRecoverableRequestCodeProvider;
         return this;
-    }
-
-    private int getRequestCode(UserRecoverableRequestCodeProvider userRecoverableRequestCodeProvider) {
-        if (userRecoverableRequestCodeProvider != null) {
-            return userRecoverableRequestCodeProvider.getRequestCode();
-        }
-
-        if (this.userRecoverableRequestCodeProvider != null) {
-            return this.userRecoverableRequestCodeProvider.getRequestCode();
-        }
-
-        return NullUserRecoverableRequestCodeProvider.getInstance().getRequestCode();
-    }
-
-    public void close() {
-        runner.close();
-    }
-
-    public boolean isFinished() {
-        return runner.isFinished();
-    }
-
-    public boolean isConnected() {
-        return runner.isConnected();
-    }
-
-    public void getFiles(GetFilesListener getFilesListener, OnFailedListener onFailedListener, UserRecoverableRequestCodeProvider userRecoverableRequestCodeProvider) {
-        GetFilesOperation operation = new GetFilesOperation(activity, getFilesListener, onFailedListener);
-        runner.addOperation(operation, getRequestCode(userRecoverableRequestCodeProvider));
-        runner.run();
-    }
-
-    public void downloadFile(File file, DownloadFileListener listener, OnFailedListener onFailedListener, UserRecoverableRequestCodeProvider userRecoverableRequestCodeProvider) {
-        DownloadFileOperation operation = new DownloadFileOperation(activity, file, listener, onFailedListener);
-        runner.addOperation(operation, getRequestCode(userRecoverableRequestCodeProvider));
-        runner.run();
     }
 
     public void uploadFile(File file, byte[] content, UploadFileListener listener, OnFailedListener onFailedListener, UserRecoverableRequestCodeProvider userRecoverableRequestCodeProvider) {
@@ -121,5 +113,17 @@ public class DriveService implements Service {
             credential.setSelectedAccountName(accountName);
         }
         return credential;
+    }
+
+    private int getRequestCode(UserRecoverableRequestCodeProvider userRecoverableRequestCodeProvider) {
+        if (userRecoverableRequestCodeProvider != null) {
+            return userRecoverableRequestCodeProvider.getRequestCode();
+        }
+
+        if (this.userRecoverableRequestCodeProvider != null) {
+            return this.userRecoverableRequestCodeProvider.getRequestCode();
+        }
+
+        return NullUserRecoverableRequestCodeProvider.getInstance().getRequestCode();
     }
 }

@@ -7,17 +7,13 @@ import android.util.Log;
 
 @TargetApi(Build.VERSION_CODES.CUPCAKE)
 class ConnectTask<T extends Service> extends AsyncTask<Void, Void, Void> {
+    private boolean isFinished = false;
     private ExecuteOperation<T> operation;
     private T service;
-    private boolean isFinished = false;
 
     public ConnectTask(ExecuteOperation<T> operation, T service) {
         this.operation = operation;
         this.service = service;
-    }
-
-    Operation<T> getOperation() {
-        return operation.getOperation();
     }
 
     public boolean isFinished() {
@@ -36,5 +32,9 @@ class ConnectTask<T extends Service> extends AsyncTask<Void, Void, Void> {
         super.onPostExecute(result);
         isFinished = true;
         operation.onFinished();
+    }
+
+    Operation<T> getOperation() {
+        return operation.getOperation();
     }
 }

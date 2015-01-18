@@ -17,8 +17,8 @@ import java.io.IOException;
 public class UploadFileOperation extends OperationBase<DriveService> implements MediaHttpUploaderProgressListener {
     public static final boolean DIRECT_UPLOAD_ENABLED = false;
     private Activity activity;
-    private File file;
     private byte[] content;
+    private File file;
     private UploadFileListener listener;
 
     public UploadFileOperation(Activity activity, File file, byte[] content, UploadFileListener listener, OnFailedListener onFailedListener) {

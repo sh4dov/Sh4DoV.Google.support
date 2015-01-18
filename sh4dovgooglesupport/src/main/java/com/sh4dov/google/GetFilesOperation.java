@@ -13,9 +13,11 @@ import java.util.List;
 class GetFilesOperation extends OperationBase<DriveService> {
     private Activity activity;
     private GetFilesListener getFilesListener;
+    private String q;
 
-    public GetFilesOperation(Activity activity, GetFilesListener getFilesListener, OnFailedListener onFailedListener) {
+    public GetFilesOperation(String q, Activity activity, GetFilesListener getFilesListener, OnFailedListener onFailedListener) {
         super(onFailedListener);
+        this.q = q;
         this.activity = activity;
         this.getFilesListener = getFilesListener;
     }
@@ -23,7 +25,11 @@ class GetFilesOperation extends OperationBase<DriveService> {
     @Override
     public void execute(DriveService scope) throws IOException {
         Drive drive = scope.getDrive();
-        final List<File> files = drive.files().list().execute().getItems();
+        Drive.Files.List list = drive.files().list();
+        if (q != null && !q.isEmpty()) {
+            list.setQ(q);
+        }
+        final List<File> files = list.execute().getItems();
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {

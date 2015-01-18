@@ -12,8 +12,8 @@ class Runner<T extends Service> {
     private final Activity activity;
     private final T service;
     private final Object sync = new Object();
-    private ConnectTask<T> task = null;
     private ConcurrentLinkedQueue<ExecuteOperation<T>> operations = new ConcurrentLinkedQueue<ExecuteOperation<T>>();
+    private ConnectTask<T> task = null;
 
 
     public Runner(Activity activity, T service) {
@@ -24,6 +24,34 @@ class Runner<T extends Service> {
     public Runner<T> addOperation(Operation<T> operation, int requestCode) {
         operations.add(new ExecuteOperation<T>(this, activity, operation, requestCode));
         return this;
+    }
+
+    @TargetApi(Build.VERSION_CODES.CUPCAKE)
+    public void close() {
+        Log.d(PackageInfo.TAG, "Pending operations to close: " + operations.size());
+        operations.clear();
+        synchronized (sync) {
+            if (isConnected()) {
+                Log.d(PackageInfo.TAG, "Closing running operation: " + task.getOperation().getClass().getName());
+                task.cancel(true);
+            }
+        }
+
+        Log.d(PackageInfo.TAG, "Closed operations");
+    }
+
+    @TargetApi(Build.VERSION_CODES.CUPCAKE)
+    public boolean isConnected() {
+        synchronized (sync) {
+            return task != null && task.getStatus() == AsyncTask.Status.RUNNING && !task.isFinished();
+        }
+    }
+
+    @TargetApi(Build.VERSION_CODES.CUPCAKE)
+    public boolean isFinished() {
+        synchronized (sync) {
+            return task != null && task.getStatus() == AsyncTask.Status.FINISHED;
+        }
     }
 
     @TargetApi(Build.VERSION_CODES.CUPCAKE)
@@ -42,33 +70,5 @@ class Runner<T extends Service> {
                 Log.w(PackageInfo.TAG, "Cannot run this task right now because previous task is not finished yet. This task will be executed after current task.");
             }
         }
-    }
-
-    @TargetApi(Build.VERSION_CODES.CUPCAKE)
-    public boolean isConnected() {
-        synchronized (sync) {
-            return task != null && task.getStatus() == AsyncTask.Status.RUNNING && !task.isFinished();
-        }
-    }
-
-    @TargetApi(Build.VERSION_CODES.CUPCAKE)
-    public boolean isFinished() {
-        synchronized (sync) {
-            return task != null && task.getStatus() == AsyncTask.Status.FINISHED;
-        }
-    }
-
-    @TargetApi(Build.VERSION_CODES.CUPCAKE)
-    public void close() {
-        Log.d(PackageInfo.TAG, "Pending operations to close: " + operations.size());
-        operations.clear();
-        synchronized (sync) {
-            if (isConnected()) {
-                Log.d(PackageInfo.TAG, "Closing running operation: " + task.getOperation().getClass().getName());
-                task.cancel(true);
-            }
-        }
-
-        Log.d(PackageInfo.TAG, "Closed operations");
     }
 }

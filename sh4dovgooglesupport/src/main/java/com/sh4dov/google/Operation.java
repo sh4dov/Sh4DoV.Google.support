@@ -6,7 +6,7 @@ interface Operation<T> {
 
     void execute(T scope) throws IOException;
 
-    void onFinished();
-
     void onFailed(Exception e);
+
+    void onFinished();
 }
